@@ -387,7 +387,15 @@ class PeerDiscovery:
 
     def get_online_peers(self):
         self._clean_old_peers()
-        return list(self.online_peers.keys())
+        local_ips = set()
+        try:
+            hostname = socket.gethostname()
+            local_ips.update(addr[4][0] for addr in socket.getaddrinfo(hostname, None))
+        except:
+            pass
+        local_ips.add('127.0.0.1')
+
+        return [peer for peer in self.online_peers.keys() if peer not in local_ips]
 
 
 if __name__ == "__main__":
